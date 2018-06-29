@@ -1,30 +1,110 @@
 SendMode Input
 
+#;::
+{
+MouseGetPos,,, WinUMID
+WinActivate, ahk_id %WinUMID%
+Send, #{Right}
+}
+return
+
+F1::
+#h::
+{
+yPad := 5, xPad := 5
+numWin := 0
+WinGetPos,,,,h, ahk_class Shell_TrayWnd
+MouseGetPos,,, WinUMID
+WinActivate, ahk_id %WinUMID%
+WinMove, ahk_id %WinUMID%, , 0, h+yPad, A_ScreenWidth/2 - xPad, A_ScreenHeight - 1.5*yPad - h
+
+SetTitleMatchMode, RegEx
+
+WinGet, vWinID, List,,,Start|Program Manager|^$
+
+Loop, %vWinID% {
+
+        id := vWinID%A_Index%
+
+        WinGet, minMax, MinMax, ahk_id %id%
+
+        If (minMax != -1) {   ; -1 = minimized
+
+        WinGetPos,,,,height  , ahk_id %id%
+
+        If (height) {
+
+        if (id != WinUMID)
+                numWin++
+        }
+
+        }
+
+}
+
+Loop, %vWinID% {
+
+        id := vWinID%A_Index%
+
+        WinGet, minMax, MinMax, ahk_id %id%
+
+        If (minMax != -1) {   ; -1 = minimized
+
+        WinGetPos,,,,height  , ahk_id %id%
+
+        If (height) {
+
+        if (id != WinUMID)
+                WinMove, ahk_id %id%, , A_ScreenWidth/2, h+yPad  + ((A_ScreenHeight-h)/numWin)*(A_Index-2), A_ScreenWidth/2 - xPad, (A_ScreenHeight - h)/numWin - yPad
+        }
+
+        }
+
+}
+
+
+}
+return
+
+#j::
+{
+MouseGetPos,,, WinUMID
+WinMinimize, ahk_id %WinUMID%
+}
+return
+
 F2::
+#o::
 
 {
-Run "./runwinsidebyside.bat"
+Run cscript.exe "./winsidebyside.vbs",, Hide
 }
 return
 
 +F2::
-
+#+o::
 {
 ; Example #2: This will visit all windows on the entire system and display info about each of them:
 WinGet, id, list,,, Program Manager
 Loop, %id%
 {
     this_id := id%A_Index%
-    WinActivate, ahk_id %this_id%
-    WinShow, ahk_id %this_id%
-    ;WinGetClass, this_class, ahk_id %this_id%
-    ;WinGetTitle, this_title, ahk_id %this_id%
-    ;MsgBox, 4, , Visiting All Windows`n%a_index% of %id%`nahk_id %this_id%`nahk_class %this_class%`n%this_title%`n`nContinue?
-    ;IfMsgBox, NO, break
+    WinGet, minMax, MinMax, ahk_id %this_id%
+
+    If (minMax == -1) {   ; -1 = minimized
+
+    WinGetPos,,,,height  , ahk_id %this_id%
+
+    If (height) {
+            WinActivate, ahk_id %this_id%
+            WinShow, ahk_id %this_id%
+    }
+    }
 }
-Run "./runwinsidebyside.bat"
+Run cscript.exe "./winsidebyside.vbs",, Hide
 }
 return
+
 ; User config! 
 ; This section binds the key combo to the switch/create/delete actions
 #1::
